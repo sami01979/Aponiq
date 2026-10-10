@@ -3,9 +3,20 @@ import { useAuth } from "../context/AuthContext";
 
 
 const NAV = {
-  admin: [{ to: "/admin", label: "Dashboard", end: true }],
-  teacher: [{ to: "/teacher", label: "Dashboard", end: true }],
+    admin: [
+    { to: "/admin", label: "Dashboard", end: true },
+    { to: "/admin/students", label: "Students" },
+    { to: "/admin/people", label: "People" },
+    { to: "/admin/batches", label: "Batches" },
+    { to: "/admin/attendance", label: "Attendance" },
+    { to: "/admin/fees", label: "Fees" },
+  ],
+  teacher: [
+    { to: "/teacher", label: "Dashboard", end: true },
+    { to: "/teacher/attendance", label: "Attendance" },
+  ],
   parent: [{ to: "/parent", label: "Dashboard", end: true }],
+  superadmin: [{ to: "/superadmin", label: "Centers", end: true }],
 };
 
 export default function DashboardLayout() {

@@ -2,7 +2,7 @@ import Student from "../models/Student.js";
 import User from "../models/User.js";
 import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-
+import { assertCanAddStudent, getUsage } from "../utils/planLimits.js";
 
 const validateParents = async (ids, center) => {
   if (!ids || ids.length === 0) return [];
@@ -22,6 +22,7 @@ const nextStudentId = async (center) => {
 export const createStudent = asyncHandler(async (req, res) => {
   const { name, gender, dob, phone, address, parents } = req.body;
   if (!name) throw new ApiError(400, "name is required");
+    await assertCanAddStudent(req.user.center);
 
   const center = req.user.center;
   const parentIds = await validateParents(parents, center);
@@ -82,6 +83,9 @@ export const getStudent = asyncHandler(async (req, res) => {
 export const updateStudent = asyncHandler(async (req, res) => {
   const student = await Student.findOne({ _id: req.params.id, center: req.user.center });
   if (!student) throw new ApiError(404, "Student not found");
+    if (req.body.isActive === true && !student.isActive) {
+    await assertCanAddStudent(req.user.center);
+  }
 
   const { name, gender, dob, phone, address, isActive, parents } = req.body;
   if (name !== undefined) student.name = name;
@@ -95,4 +99,8 @@ export const updateStudent = asyncHandler(async (req, res) => {
   await student.save();
   await student.populate("parents", "name phone");
   res.json({ success: true, student });
+});
+// GET /api/students/usage
+export const studentUsage = asyncHandler(async (req, res) => {
+  res.json({ success: true, ...(await getUsage(req.user.center)) });
 });

@@ -3,6 +3,7 @@ import User from "../models/User.js";
 import { env } from "../config/env.js";
 import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { assertCenterAccess } from "../utils/centerAccess.js";
 
 export const protect = asyncHandler(async (req, res, next) => {
   let token = req.cookies?.token;
@@ -20,6 +21,8 @@ export const protect = asyncHandler(async (req, res, next) => {
 
   const user = await User.findById(decoded.id);
   if (!user || !user.isActive) throw new ApiError(401, "Account not available");
+
+  await assertCenterAccess(user);
 
   req.user = user;
   next();

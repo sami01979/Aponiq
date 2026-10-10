@@ -1,11 +1,18 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
-export const ROLES = ["admin", "teacher", "student", "parent"];
+export const ROLES = ["superadmin", "admin", "teacher", "student", "parent"];
 
 const userSchema = new mongoose.Schema(
   {
-    center: { type: mongoose.Schema.Types.ObjectId, ref: "Center", required: true, index: true },
+        center: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Center",
+      required: function () {
+        return this.role !== "superadmin";
+      },
+      index: true,
+    },
     name: { type: String, required: true, trim: true },
     phone: { type: String, required: true, unique: true, trim: true },
     email: { type: String, trim: true, lowercase: true },
